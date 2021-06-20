@@ -4,7 +4,7 @@
 程式碼繼承(inherited)自[DB]([https://github.com/Megvii-CSG/MegReader](https://github.com/MhLiao/DB)).
 
 
-## 安裝
+## 安裝 
 
 ### Requirements:
 - Python3
