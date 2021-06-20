@@ -132,12 +132,8 @@ class Eval:
             time_cost * 1000, 1 / time_cost))
         
         return time_cost
-
-    """
-    def format_output(self, batch, output):
-       
-
         
+    def format_output(self, batch, output):
         batch_boxes, batch_scores = output
         for index in range(batch['image'].size(0)):
             original_shape = batch['shape'][index]
@@ -146,8 +142,6 @@ class Eval:
             result_file_path = os.path.join(self.args['result_dir'], result_file_name)
             boxes = batch_boxes[index]
             scores = batch_scores[index]
-            if np.all(scores == 0)
-                     
             if self.args['polygon']:
                 with open(result_file_path, 'wt') as res:
                     for i, box in enumerate(boxes):
@@ -164,7 +158,6 @@ class Eval:
                         box = boxes[i,:,:].reshape(-1).tolist()
                         result = ",".join([str(int(x)) for x in box])
                         res.write(result + ',' + str(score) + "\n")
-                        """
         
     def eval(self, visualize=False):
         self.init_torch_tensor()
@@ -180,55 +173,11 @@ class Eval:
                     if self.args['test_speed']:
                         time_cost = self.report_speed(model, batch, times=50)
                         continue
-                    check=True
-                    list=[]
-                    while check:
-                        pred = model.forward(batch, training=False)
-                        output = self.structure.representer.represent(batch, pred, is_output_polygon=self.args['polygon'])
-                        if not os.path.isdir(self.args['result_dir']):
-                            os.mkdir(self.args['result_dir'])
-                        #self.format_output(batch, output)
-
-                        batch_boxes, batch_scores = output
-                        for index in range(batch['image'].size(0)):
-                            if len(list)==0:
-                                list.append(index)
-                                original_shape = batch['shape'][index]
-                                list.append(original_shape)
-                                filename = batch['filename'][index]
-                                list.append(filename)
-
-                            else:
-                                index,original_shape,filename=list
-
-                            result_file_name = 'res_' + filename.split('/')[-1].split('.')[0] + '.txt'
-                            result_file_path = os.path.join(self.args['result_dir'], result_file_name)
-                            boxes = batch_boxes[index]
-                            scores = batch_scores[index]
-                            list.clear()
-                            if np.all(scores == 0):
-                                check=True
-                                continue
-                            else:
-
-                                if self.args['polygon']:
-                                    with open(result_file_path, 'wt') as res:
-                                        for i, box in enumerate(boxes):
-                                            box = np.array(box).reshape(-1).tolist()
-                                            result = ",".join([str(int(x)) for x in box])
-                                            score = scores[i]
-                                            res.write(result + ',' + str(score) + "\n")
-                                else:
-                                    with open(result_file_path, 'wt') as res:
-                                        for i in range(boxes.shape[0]):
-                                            score = scores[i]
-                                            if score < self.args['box_thresh']:
-                                                continue
-                                            box = boxes[i, :, :].reshape(-1).tolist()
-                                            result = ",".join([str(int(x)) for x in box])
-                                            res.write(result + ',' + str(score) + "\n")
-                                check=False
-
+                    pred = model.forward(batch, training=False)
+                    output = self.structure.representer.represent(batch, pred, is_output_polygon=self.args['polygon']) 
+                    if not os.path.isdir(self.args['result_dir']):
+                        os.mkdir(self.args['result_dir'])
+                    self.format_output(batch, output)
                     raw_metric = self.structure.measurer.validate_measure(batch, output, is_output_polygon=self.args['polygon'], box_thresh=self.args['box_thresh'])
                     raw_metrics.append(raw_metric)
 
